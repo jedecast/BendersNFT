@@ -13,15 +13,15 @@ module.exports = async ({
   const vrfCoordinator = networkConfig[chainId].vrfCoordinator;
   const linkTokenAddress = networkConfig[chainId].linkToken;
 
-  const SaberNFT = await deploy('SaberNFT', {
+  const Benders = await deploy('Benders', {
     from: deployer,
     args: [vrfCoordinator, linkTokenAddress, keyHash],
     log: true,
   });
   log('-----------------------------------------------------------------------------------');
-  log('The SaberNFT contract has been deployed in the contract address:', SaberNFT.address);
+  log('The Benders contract has been deployed in the contract address:', Benders.address);
   log('-----------------------------------------------------------------------------------');
-  log('To fund your contract with link, copy and run this command: npx hardhat fund-link --contract', SaberNFT.address, '--network', networkConfig[chainId].name);
+  log('To fund your contract with link, copy and run this command: npx hardhat fund-link --contract', Benders.address, '--network', networkConfig[chainId].name);
   log('-----------------------------------------------------------------------------------');
-  log('To create and mint a hero: npx hardhat create-hero --contract', SaberNFT.address, '--name <name of hero>', '--seed <user-selected seed>', '--network', networkConfig[chainId].name);
+  log('To create and mint a hero: npx hardhat create-hero --contract', Benders.address, '--name <name of hero>', '--seed <user-selected seed>', '--network', networkConfig[chainId].name);
 }

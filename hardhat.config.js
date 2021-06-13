@@ -5,13 +5,14 @@ require("@nomiclabs/hardhat-waffle")
 require("@nomiclabs/hardhat-ethers")
 require("@nomiclabs/hardhat-etherscan")
 require("@nomiclabs/hardhat-web3");
-require("hardhat-deploy")
+require("hardhat-deploy") // exporting ABI to src file: npx hardhat deploy --network rinkeby --export "./src/Benders.json"
 //imports tasks
 require("./tasks/accounts")
 require("./tasks/balance")
 require("./tasks/fund-link")
+require("./tasks/Benders/create-metadata")
 
-//PUT THIS IN THE TASK FILE AFTER CREATION
+//PUT THIS IN THE TASK FILE OR APP.JS AFTER CREATION
 const { create } = require('ipfs-http-client') //https://www.npmjs.com/package/ipfs-http-client
 const pinataSDK = require('@pinata/sdk') //https://www.npmjs.com/package/@pinata/sdk#hostNode-anchor
 
@@ -82,5 +83,5 @@ module.exports = {
     },
     mocha: {
         timeout: 100000
-    }
+    },
 }
