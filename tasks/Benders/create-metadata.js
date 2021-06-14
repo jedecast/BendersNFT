@@ -78,7 +78,7 @@ task('create-metadata', "Creates the meta data file on ipfs")
       .then((BN) => BN.toNumber())
 
     //loops total as an index to create metadata
-    for (var index = 0; index < total; index++) {
+    for (var index = 12; index < total; index++) {
       //gets name of hero
       const name = await contractInstance.getHeroOverView(index)
         .then((overview) => overview[0].toString())
@@ -102,8 +102,9 @@ task('create-metadata', "Creates the meta data file on ipfs")
       heroMetadata['attributes'][4]['value'] = stats[4]
       heroMetadata['attributes'][5]['value'] = stats[5]
 
-
+      console.log(heroMetadata)
       const { path } = await client.add(JSON.stringify(heroMetadata))
+      console.log(path)
 
       /* !!!!!!!!!!!!!!!!!!!NEED TO DO LATER: PIN THE NAME OF THE CID ALSO!!!!!!!!!!!! */
       console.log('Pinning CID', path, 'to pinata...')
