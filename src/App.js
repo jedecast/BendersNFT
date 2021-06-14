@@ -19,6 +19,8 @@ function App() {
   const [ transactionFinished, setTransactionFinished ] = React.useState(true);
   const [ loadingMessage, setLoadingMessage ] = React.useState('Transaction Processing...')
   const [ index, setIndex ] = React.useState(0)
+  const [ image, setImage ] = React.useState('')
+  const [ nameOfMostRecentHero, setNameOfMostRecentHero ] = React.useState()
 
   // connect to the default IPFS API address http://localhost:5001 -> have to use infura to work in browser, need to investigate later on why
   // https://infura.io/docs/ipfs
@@ -29,6 +31,8 @@ function App() {
   const REACT_APP_PINATA_SECRET = process.env.REACT_APP_PINATA_SECRET
   const pinata = pinataSDK(REACT_APP_PINATA_API_KEY, REACT_APP_PINATA_SECRET)
 
+
+
   React.useEffect(() => {
     const initEthers = async() => {
       try {
@@ -37,6 +41,7 @@ function App() {
         const provider = new ethers.providers.Web3Provider(window.ethereum)
         const signer = provider.getSigner()
         const accountsArray = [await signer.getAddress()]
+
 
         const network = await provider.getNetwork()
         const contractAddress = Benders.contracts.Benders.address
@@ -70,21 +75,21 @@ function App() {
           console.log('return', amount.args[1])
           const BN = amount.args[1]
           const tokenId = await BN.toNumber()
-          //gets name of hero
-          const name = await instance.getHeroOverView(index)
+          //gets name of hero based on tokenId retrieved from event
+          const nameOfHero = await instance.getHeroOverView(tokenId)
             .then((overview) => overview[0].toString())
 
-          //gets heroId for image
-          const heroId = await instance.getHeroOverView(index)
+          //gets heroId for image based on tokenId retrieved from event
+          const heroId = await instance.getHeroOverView(tokenId)
             .then((overview) => overview[1].toNumber())
-          console.log(tokenId, name, heroId)
+          console.log(tokenId, nameOfHero, heroId)
           //sets the URI for the
-          const uri = await setURI(instance, signer, name, tokenId, heroId)
+          const uri = await setURI(instance, signer, nameOfHero, tokenId, heroId)
 
           setIndex(tokenId)
           setTransactionFinished(true)
-          console.log(name, 'HAS BEEN MINTED! URI is:', uri)
-          alert(name, 'HAS BEEN MINTED! URI is:', uri)
+          console.log(nameOfHero, 'HAS BEEN MINTED! URI is:', uri)
+          alert(nameOfHero, 'HAS BEEN MINTED! URI is:', uri)
         })
 
 
@@ -152,6 +157,12 @@ function App() {
 
     const setURI = await summonerSigner.setURI(_tokenId, ipfsURI)
     await setURI.wait()
+    fetch(ipfsURI)
+        .then(response => response.json())
+        .then(data => {
+          setImage(data.image)
+          setNameOfMostRecentHero(data.name)
+        })
     //NEED TO SETUP ANOTHER EVENT LISTENER? To trigger when ipfs uri is ready to create a get request
     return ipfsURI
 
@@ -171,11 +182,17 @@ function App() {
     const name = result[0]
     const characterID = await result[1].toNumber()
     const uri = await contract.getURI(index)
+    fetch(uri)
+        .then(response => response.json())
+        .then(data => {
+          setImage(data.image)
+          setNameOfMostRecentHero(data.name)
+        })
     console.log(name, characterID, uri)
   }
 
 
-  console.log(accounts)
+  //console.log(accounts)
   return (
     <div className="App">
       <h3>Current Account</h3>
@@ -197,6 +214,8 @@ function App() {
       <h3>Request New Hero</h3>
       <button onClick={() => getHeroInfo()}>Get Hero Info</button>
       <button onClick={() => getHeroURI()}>Get Hero URI</button>
+      <h3>Most Recently Minted Hero: {nameOfMostRecentHero}</h3>
+      <img src={image}/>
     </div>
   );
 }
